@@ -1,7 +1,7 @@
 .PHONY: rithm
 
 rithm-setup:
-        mkdir files
+	mkdir files
 	cp /Users/joel/curric/assessments/installations/files/gitignore_global files
 	cp /Users/joel/curric/assessments/installations/files/zshrc files
 	docker build -t joelburton/rithm-setup ../rithm
