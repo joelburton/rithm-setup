@@ -14,5 +14,5 @@ The setup::
   username: user
   password: password
 
-Ports 3000 and 3001 are forwarded from the container to the host.
+Ports 5000, 3000 and 3001 are forwarded from the container to the host.
 
