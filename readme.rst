@@ -5,8 +5,9 @@ An experimental attempt at making a Docker container for the Rithm student setup
 
 To try out::
 
-  make rithm-setup    # need to do once
-  make rithm          # starts container and drops you into it
+  make build    # need to do only if Dockerfile changed
+  make create   # need to do once to make container
+  make start    # starts container and drops you into it
 
 The setup::
 
