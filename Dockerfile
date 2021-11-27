@@ -1,26 +1,45 @@
+# Dockerfile for the Rithm fullstack bootcamp setup
+# Created and maintained by joel@joelburton.com
+
 FROM ubuntu
+
 RUN apt -y update && apt -y upgrade
 RUN yes | unminimize
+
+# Need to install now, so we can prevent it from pop-up-asking-for-timezone
 ENV DEBIAN_FRONTEND=noninteractive
-RUN apt-get -y install tzdata sudo zsh
-RUN apt-get -y install build-essential less nano curl zip man info vim fd-find procps
+RUN apt-get -y install tzdata
+
+RUN apt-get -y install \
+  build-essential less nano curl zip man info vim procps sudo lsof netcat \
+  zsh \
+  git
+
 RUN apt-get -y install python3 python3-venv python3-dev ipython3 flake8
+
 RUN apt-get -y install postgresql libpq-dev  
-RUN service postgresql start && echo password | sudo -Su postgres createuser -s user && sudo -Su postgres createdb user
+RUN \
+  service postgresql start && \
+  echo password | sudo -Su postgres sh -c "createuser -s user && createdb user"
+
+# Need specific and more modern version of Node than Ubuntu ships with
 RUN curl -fsSL https://deb.nodesource.com/setup_16.x | bash -
 RUN apt-get -y install nodejs
 RUN npm -g install nodemon
-RUN apt-get -y install git
-RUN apt-get -y install tree
-RUN apt-get -y install httpie
+
+RUN apt-get -y install tree httpie fd-find psmisc jq neofetch
+
+# Doing via npm because snaps suck and other options are Intel-specific
 RUN npm -g install heroku
-RUN useradd user -m -s /usr/bin/zsh -G sudo && echo "user:password" | chpasswd
+
+# Create user "user" with password "password" and allow them to use sudo
+RUN useradd user -m -s /usr/bin/zsh -G sudo && echo user:password | chpasswd
 USER user
-COPY files/zshrc /home/user/.zshrc
-RUN git config --global --add core.excludesfile ~/.gitignore_global && \
-  git config --global --add credential.helper store && \
-  git config --global init.defaultBranch main && \
-  git config --global pull.rebase false
-COPY files/gitignore_global /home/user/.gitignore_global
 WORKDIR /home/user
+
+RUN curl -s https://rithm-setup.s3.amazonaws.com/zshell-setup.sh | bash -
+RUN curl -s https://rithm-setup.s3.amazonaws.com/git-setup.sh | bash -
+# Add username & hostname to start of prompt
+RUN echo PROMPT=\"%F{red}%n@%m%f \$PROMPT\" >> /home/user/.zprompt.zsh
+
 ENTRYPOINT ["zsh"]
